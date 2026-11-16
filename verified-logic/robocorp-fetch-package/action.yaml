@@ -1,0 +1,58 @@
+kind: verified_action_v1
+slug: robocorp-fetch-package
+title: Robocorp Fetch Package
+summary: Download one Robocorp Control Room task package zip into Project files, with its tasks and checksum, using the signed download link once and never storing it.
+scope: org
+language: python
+module: action
+callable: run
+input_schema:
+  type: object
+  additionalProperties: false
+  properties:
+    workspace_id:
+      type: string
+      pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    package_id:
+      type: string
+      minLength: 1
+      description: Control Room task package id (from a process step's task_package.id).
+    output_dir:
+      type: string
+      default: relink/packages
+    credential_env:
+      type: string
+      default: ROBOCORP_API
+    api_base:
+      type: string
+      default: https://cloud.robocorp.com
+  required:
+    - workspace_id
+    - package_id
+output_schema:
+  type: object
+  additionalProperties: false
+  properties:
+    id: {type: [string, integer, "null"]}
+    name: {type: [string, "null"]}
+    type: {type: [string, "null"]}
+    tasks: {type: array, items: {type: [string, "null"]}}
+    configuration: {type: [object, "null"]}
+    zip_path: {type: string}
+    metadata_path: {type: string}
+    size_bytes: {type: integer}
+    sha256: {type: string}
+    storage_host: {type: string}
+    file_count: {type: integer}
+    has_robot_yaml: {type: boolean}
+    files: {type: array, items: {type: string}}
+  required: [id, name, tasks, zip_path, metadata_path, size_bytes, sha256, storage_host, file_count, has_robot_yaml, files]
+user_explainer: Use this to bring a Robocorp task package's code into the Project so it can be read with robocorp-code-peek and uploaded to v3.
+side_effects:
+  - reads the Robocorp Control Room API (GET only) and its package storage
+  - writes relink/packages/<name>.zip and <name>.json (or output_dir)
+allowed_sdk_surfaces: []
+external_io: true
+writes_workspace: true
+examples:
+  - examples/basic.json

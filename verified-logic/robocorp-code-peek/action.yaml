@@ -1,0 +1,55 @@
+kind: verified_action_v1
+slug: robocorp-code-peek
+title: Robocorp Code Peek
+summary: Read a Robocorp task package zip, without running it, and list the secrets, assets, environment variables, work item use, UI needs and dependency risks that a relink to v3 must handle.
+scope: org
+language: python
+module: action
+callable: run
+input_schema:
+  type: object
+  additionalProperties: false
+  properties:
+    zip_path:
+      type: string
+      minLength: 1
+      description: Workspace-relative path of the task package .zip (robot.yaml at its root or in one top folder).
+  required:
+    - zip_path
+output_schema:
+  type: object
+  additionalProperties: false
+  properties:
+    zip_path: {type: string}
+    tasks: {type: array, items: {type: string}}
+    secrets:
+      type: array
+      items: {type: object, properties: {name: {type: string}, where: {type: array, items: {type: string}}}, required: [name, where]}
+    assets_read:
+      type: array
+      items: {type: object, properties: {name: {type: string}, where: {type: array, items: {type: string}}}, required: [name, where]}
+    assets_written:
+      type: array
+      items: {type: object, properties: {name: {type: string}, where: {type: array, items: {type: string}}}, required: [name, where]}
+    dynamic_access:
+      type: array
+      items: {type: object, properties: {kind: {type: string}, where: {type: string}, expression: {type: string}}, required: [kind, where]}
+    env_vars:
+      type: array
+      items: {type: object, properties: {name: {type: string}, where: {type: array, items: {type: string}}}, required: [name, where]}
+    rc_vars_used: {type: array, items: {type: string}}
+    uses_work_items: {type: boolean}
+    uses_work_item_files: {type: boolean}
+    ui_requirements: {type: array, items: {type: string}}
+    dependencies: {type: object, additionalProperties: {type: array, items: {type: string}}}
+    warnings: {type: array, items: {type: string}}
+    files_scanned: {type: array, items: {type: string}}
+    files_skipped_too_large: {type: array, items: {type: string}}
+  required: [zip_path, tasks, secrets, assets_read, assets_written, dynamic_access, env_vars, rc_vars_used, uses_work_items, uses_work_item_files, ui_requirements, dependencies, warnings, files_scanned, files_skipped_too_large]
+user_explainer: Use this after downloading a Robocorp task package to see exactly which secrets and assets it needs on v3 and what could break, before creating anything.
+side_effects: []
+allowed_sdk_surfaces: []
+external_io: false
+writes_workspace: false
+examples:
+  - examples/basic.json

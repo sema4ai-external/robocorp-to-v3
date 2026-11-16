@@ -1,0 +1,75 @@
+kind: verified_action_v1
+slug: robocorp-inventory
+title: Robocorp Inventory
+summary: Read-only inventory of a Robocorp Control Room workspace (processes with steps, triggers and schedules, task packages, workers, worker groups, asset names, Vault secret names, webhooks) into Project files, throttled to the Control Room rate limit.
+scope: org
+language: python
+module: action
+callable: run
+input_schema:
+  type: object
+  additionalProperties: false
+  properties:
+    workspace_id:
+      type: string
+      pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+      description: Control Room workspace UUID.
+    output_dir:
+      type: string
+      default: relink/inventory
+    process_ids:
+      type: array
+      items: {type: string}
+      description: Only fetch details for these processes. Omit for all.
+    refresh:
+      type: boolean
+      default: false
+      description: Re-fetch files that already exist. By default existing files are kept, so a run that stopped on time can be resumed.
+    max_seconds:
+      type: number
+      minimum: 10
+      maximum: 900
+      default: 100
+      description: Stop fetching process details after this long and report the rest as pending.
+    credential_env:
+      type: string
+      default: ROBOCORP_API
+      description: Environment name of the Project network credential that holds 'RC-WSKEY <key>'.
+    api_base:
+      type: string
+      default: https://cloud.robocorp.com
+  required:
+    - workspace_id
+output_schema:
+  type: object
+  additionalProperties: false
+  properties:
+    workspace_name: {type: [string, "null"]}
+    organization: {type: [string, "null"]}
+    output_dir: {type: string}
+    counts: {type: object, additionalProperties: {type: integer}}
+    processes_detailed: {type: integer}
+    pending_process_ids: {type: array, items: {type: string}}
+    complete: {type: boolean}
+    api_calls: {type: integer}
+    files_written: {type: integer}
+    processes:
+      type: array
+      items:
+        type: object
+        properties:
+          id: {type: string}
+          name: {type: [string, "null"]}
+          steps: {type: integer}
+          triggers: {type: array, items: {type: [string, "null"]}}
+          schedules: {type: integer}
+  required: [workspace_name, output_dir, counts, processes_detailed, pending_process_ids, complete, api_calls, files_written, processes]
+user_explainer: Use this at the start of a Robocorp relink to see what the Control Room workspace contains. It only reads; Vault secret values are never requested.
+side_effects:
+  - reads the Robocorp Control Room API (GET only)
+  - writes relink/inventory/*.json (or output_dir)
+allowed_sdk_surfaces: []
+external_io: true
+writes_workspace: true
+examples:
+  - examples/basic.json

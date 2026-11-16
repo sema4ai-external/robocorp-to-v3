@@ -1,0 +1,41 @@
+{
+ "input": {
+  "zip_path": "relink/packages/web-store-orders.zip"
+ },
+ "output": {
+  "zip_path": "relink/packages/web-store-orders.zip",
+  "tasks": [
+   "Split orders file",
+   "Load and Process All Orders",
+   "Mock Errors while Processing Orders"
+  ],
+  "secrets": [],
+  "assets_read": [],
+  "assets_written": [],
+  "dynamic_access": [],
+  "env_vars": [],
+  "rc_vars_used": [],
+  "uses_work_items": true,
+  "uses_work_item_files": true,
+  "ui_requirements": [
+   "browser_selenium"
+  ],
+  "dependencies": {
+   "conda.yaml": [
+    "python=3.9.13",
+    "rpaframework==17.7.0"
+   ]
+  },
+  "warnings": [
+   "Uses RPA.Browser.Selenium but does not pin webdriver-manager. A fresh build can pull an incompatible webdriver-manager (seen: rpaframework 17.7.0 + webdriver-manager 3.9.1 fails to import). Pin it or upgrade rpaframework before relinking."
+  ],
+  "files_scanned": [
+   "SwagLabs.robot",
+   "conda.yaml",
+   "consumer.robot",
+   "producer.robot",
+   "robot.yaml"
+  ],
+  "files_skipped_too_large": []
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "input": {
+  "workspace_id": "00000000-0000-4000-8000-000000000001",
+  "package_id": "12345"
+ },
+ "output": {
+  "id": "12345",
+  "name": "invoice-processing",
+  "type": "zip",
+  "tasks": [
+   "Producer",
+   "Consumer"
+  ],
+  "configuration": null,
+  "zip_path": "relink/packages/invoice-processing.zip",
+  "metadata_path": "relink/packages/invoice-processing.json",
+  "size_bytes": 4096,
+  "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "storage_host": "eu1-example-robocloud.s3.eu-west-1.amazonaws.com",
+  "file_count": 3,
+  "has_robot_yaml": true,
+  "files": [
+   "conda.yaml",
+   "robot.yaml",
+   "tasks.py"
+  ]
+ }
+}

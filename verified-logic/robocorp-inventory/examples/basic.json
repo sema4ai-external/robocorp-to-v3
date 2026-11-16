@@ -1,0 +1,38 @@
+{
+ "input": {
+  "workspace_id": "00000000-0000-4000-8000-000000000001",
+  "process_ids": [
+   "00000000-0000-4000-8000-0000000000a1"
+  ]
+ },
+ "output": {
+  "workspace_name": "Example Workspace",
+  "organization": "Example Org",
+  "output_dir": "relink/inventory",
+  "counts": {
+   "processes": 12,
+   "task-packages": 15,
+   "workers": 2,
+   "worker-groups": 1,
+   "assets": 3,
+   "secrets": 8,
+   "webhooks": 0
+  },
+  "processes_detailed": 1,
+  "pending_process_ids": [],
+  "complete": true,
+  "api_calls": 10,
+  "files_written": 11,
+  "processes": [
+   {
+    "id": "00000000-0000-4000-8000-0000000000a1",
+    "name": "Invoice Processing",
+    "steps": 2,
+    "triggers": [
+     "email"
+    ],
+    "schedules": 1
+   }
+  ]
+ }
+}
