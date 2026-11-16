@@ -20,7 +20,8 @@ This repository holds what does the work: the **Robocorp Relink** skill and thre
 In your AI tool, with this folder open and the v3 connector connected, paste:
 
 ```text
-Install the Robocorp relink kit from this repository into my Sema4.ai v3 workspace.
+Install the Robocorp relink kit from this repository (https://github.com/sema4ai-external/robocorp-to-v3)
+into my Sema4.ai v3 workspace.
 Use the Sema4 Workspace MCP connector and follow INSTALL.md step by step.
 Ask me before anything that needs my decision, and finish with a short report of what was installed.
 ```
