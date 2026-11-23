@@ -1,0 +1,10 @@
+# Which robot folder publishes to which v3 task package.
+# Getting started: one environment. See README.md for the DEV/PROD version.
+
+environments:
+  default:
+    workspace: <account id>             # v3: package > Publish > Publish with rcc > "Account ID"
+
+packages:
+  robots/my-robot:                      # folder holding robot.yaml, from the repository root
+    default: <package id>

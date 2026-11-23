@@ -1,0 +1,37 @@
+# Publishes robot folders to Sema4.ai v3 task packages on every push to main.
+# Getting started: copy to .github/workflows/ and see publish-from-git/README.md in
+# https://github.com/sema4ai-external/robocorp-to-v3.
+name: Publish to v3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "robots/**"                     # your robot folders
+      - "v3-publish/v3-packages.yaml"
+  workflow_dispatch:                    # "Run workflow" publishes every mapped folder
+
+concurrency:
+  group: publish-to-v3                  # one publish at a time, so versions land in order
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0                # the script compares with the previous push
+      - name: Publish changed robots
+        env:
+          V3_URL: ${{ vars.V3_URL }}
+          V3_RCC_CREDENTIALS: ${{ secrets.V3_RCC_CREDENTIALS }}
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            v3-publish/taskpackage_sync.py --base "${{ github.event.before }}"
+          else
+            v3-publish/taskpackage_sync.py --all
+          fi

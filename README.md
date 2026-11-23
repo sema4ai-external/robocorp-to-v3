@@ -50,6 +50,10 @@ The agent starts with a 10-step roadmap and asks for your Control Room workspace
 
 Nothing runs on a schedule, and nothing in Control Room changes, until you do the cutover yourself.
 
+## After the relink: publish from Git
+
+Control Room could publish robots straight from GitHub or GitLab. On v3, your CI publishes with `rcc cloud push`. [Publish robots from Git to v3](publish-from-git/README.md) gets you there in two steps: first, every push to `main` publishes the robots that changed; then, merges publish to DEV and release tags to PROD after approval.
+
 ## What's in this repository
 
 | Path | What it is |
@@ -59,6 +63,7 @@ Nothing runs on a schedule, and nothing in Control Room changes, until you do th
 | `verified-logic/robocorp-fetch-package/` | Downloads one task package zip from Control Room into the project. |
 | `verified-logic/robocorp-code-peek/` | Reads a package zip without running it, and lists the secrets, assets, variables, work item use, UI needs and dependency risks. |
 | `INSTALL.md` | The install steps your AI tool follows. |
+| `publish-from-git/` | Publish robots from GitHub to v3 task packages on every push, with an optional DEV/PROD setup. See [its guide](publish-from-git/README.md). |
 
 ## Security in short
 

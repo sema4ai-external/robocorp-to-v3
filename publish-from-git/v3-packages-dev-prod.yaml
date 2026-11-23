@@ -1,0 +1,17 @@
+# Which robot folder publishes to which v3 task package, per environment.
+# DEV: every merge to main. PROD: release tags, after approval. See README.md.
+
+environments:
+  dev:
+    workspace: <dev account id>
+  prod:
+    workspace: <prod account id>        # the same id as dev when DEV and PROD packages share a workspace
+    # url: https://other.instance       # only when PROD is on another v3 instance than V3_URL
+
+packages:
+  robots/my-robot:
+    release: my-robot                   # tag prefix: my-robot/v1.2.0. Defaults to the folder name.
+    dev: <package id>
+    prod: <package id>
+  robots/experimental-bot:
+    dev: <package id>                   # no prod id: never released to PROD
