@@ -1,0 +1,36 @@
+# DRAFT: not yet run on GitLab.
+# Publishes robot folders to Sema4.ai v3 task packages:
+#   Push to the default branch -> DEV packages, for each mapped folder that changed.
+#   Tag <release>/v1.2.0       -> that robot's PROD package, after approval of the v3-prod environment.
+#   Tag v1.2.0                 -> every robot's PROD package, after approval.
+# Include from .gitlab-ci.yml and see publish-from-git/README.md in
+# https://github.com/sema4ai-external/robocorp-to-v3.
+
+.publish-to-v3:
+  stage: deploy
+  image: python:3.12                    # includes git, which the script uses
+
+publish-to-v3-dev:
+  extends: .publish-to-v3
+  environment: v3-dev
+  resource_group: v3-dev                # one publish per environment at a time
+  variables:
+    GIT_DEPTH: 0                        # the script compares with the previous push
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
+      variables:
+        SYNC_ARGS: --base $CI_COMMIT_BEFORE_SHA
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "web"
+      variables:
+        SYNC_ARGS: --all
+  script:
+    - python3 v3-publish/taskpackage_sync.py --environment dev $SYNC_ARGS
+
+publish-to-v3-prod:
+  extends: .publish-to-v3
+  environment: v3-prod                  # protected environment: waits for approval
+  resource_group: v3-prod
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^([^\/]+\/)?v[0-9]/
+  script:
+    - python3 v3-publish/taskpackage_sync.py --environment prod --tag "$CI_COMMIT_TAG"

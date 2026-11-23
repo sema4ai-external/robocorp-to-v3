@@ -9,7 +9,7 @@ This guide has two levels:
 1. **[Getting started](#getting-started)**: every push to `main` publishes the robots that changed. One package per robot, a few minutes to set up.
 2. **[DEV and PROD](#dev-and-prod)**: merges publish to DEV packages, and a release tag publishes to PROD after someone approves it. It builds on the first level, so start there.
 
-Both use GitHub Actions. GitLab CI is coming next.
+Each level is written for GitHub Actions, with a GitLab CI section after it. The GitLab templates are a **DRAFT**: they follow the same steps as the GitHub ones, which run against v3, but they have not run on GitLab yet.
 
 ## What's in this folder
 
@@ -20,12 +20,14 @@ Both use GitHub Actions. GitLab CI is coming next.
 | `v3-packages-dev-prod.yaml` | The mapping for DEV and PROD. |
 | `github/publish-to-v3.yml` | GitHub Actions workflow for getting started. |
 | `github/publish-to-v3-dev-prod.yml` | GitHub Actions workflow for DEV and PROD. |
+| `gitlab/publish-to-v3.gitlab-ci.yml` | GitLab CI job for getting started. **DRAFT** |
+| `gitlab/publish-to-v3-dev-prod.gitlab-ci.yml` | GitLab CI jobs for DEV and PROD. **DRAFT** |
 
 The examples assume this layout in your repository. If yours differs, change the paths in the workflow and the mapping.
 
 ```text
 your-repo/
-├── .github/workflows/publish-to-v3.yml
+├── .github/workflows/publish-to-v3.yml      # GitHub; on GitLab, .gitlab-ci.yml
 ├── v3-publish/
 │   ├── taskpackage_sync.py
 │   └── v3-packages.yaml
@@ -105,6 +107,30 @@ To see what would be published without contacting v3:
 v3-publish/taskpackage_sync.py --base HEAD~3 --dry-run
 ```
 
+### On GitLab (DRAFT)
+
+Steps 1 and 2 are the same. Then:
+
+1. **Add the files.** Copy `taskpackage_sync.py` and `v3-packages.yaml` into `v3-publish/` as above, and copy `gitlab/publish-to-v3.gitlab-ci.yml` into `v3-publish/` too. Include it from your `.gitlab-ci.yml`, or create that file with only this:
+
+   ```yaml
+   include:
+     - local: v3-publish/publish-to-v3.gitlab-ci.yml
+   ```
+
+   The job runs in the `deploy` stage. If your `.gitlab-ci.yml` lists its own `stages:`, make sure `deploy` is one of them.
+2. **Add the variables** under **Settings → CI/CD → Variables**:
+
+   | Name | Value | Settings |
+   |---|---|---|
+   | `V3_RCC_CREDENTIALS` | The `identifier:secret` from step 2 | Masked, Protected |
+   | `V3_URL` | Your v3 address, for example `https://us3.sema4.ai` | |
+
+   A protected variable reaches only pipelines on protected branches and tags. The default branch is protected by default.
+3. **Push** to the default branch. The `publish-to-v3` job in the pipeline lists each robot it published. **Build → Pipelines → Run pipeline** on the default branch publishes all of them.
+
+The job uses the `python:3.12` image, which includes git, so it needs a runner that can run Docker images. GitLab.com's shared runners can.
+
 ## DEV and PROD
 
 Getting started puts every merge straight into the package your workflows run. For production, keep a DEV package next to it and promote to PROD on purpose.
@@ -119,7 +145,7 @@ This is trunk-based development with promotion by tag, the pattern most enterpri
 
 * **PROD runs exactly what was tested in DEV.** A tag points at a commit that is already on `main`, and so already in DEV. The bundle that reaches PROD is the same one, byte for byte.
 * **"What's in PROD?" has a one-word answer:** the latest release tag.
-* **Approval and secrets come from GitHub.** The PROD credential lives in the `v3-prod` environment. Only release-tag runs can use it, and only after a reviewer approves.
+* **Approval and secrets come from your CI platform.** The PROD credential lives in the `v3-prod` environment. Only release-tag runs can use it, and only after a reviewer approves.
 * **Rollback is a re-run** of the previous tag's release.
 * **One repository can hold many robots.** A tag with a robot's name releases only that robot.
 
@@ -200,6 +226,17 @@ To check what a tag would release without contacting v3:
 ```bash
 v3-publish/taskpackage_sync.py --environment prod --tag invoice-bot/v1.2.0 --dry-run
 ```
+
+### On GitLab (DRAFT)
+
+Steps 1 and 4 (the DEV packages and the mapping) are the same. In place of steps 2 and 3:
+
+1. **Protect the release tags.** Under **Settings → Repository → Protected tags**, protect `*/v*` and `v*`, and allow only release managers to create them.
+2. **Protect `v3-prod`.** Push once with the new template (step 3 below), so GitLab creates the `v3-dev` and `v3-prod` environments. Then, under **Settings → CI/CD → Protected environments**, protect `v3-prod` and set the approvers. Approvals need GitLab Premium or Ultimate. Without them, the protected tags are the only gate.
+3. **Scope the credential per environment.** Under **Settings → CI/CD → Variables**, replace `V3_RCC_CREDENTIALS` with two variables of the same name. Set **Environment scope** to `v3-dev` on one and to `v3-prod` on the other, and keep both Masked and Protected. A job gets only the value scoped to its own environment.
+4. **Switch the template.** Replace `v3-publish/publish-to-v3.gitlab-ci.yml` with `gitlab/publish-to-v3-dev-prod.gitlab-ci.yml`, keeping the file name, and push.
+
+To release, push a tag as above. The `publish-to-v3-prod` job waits for approval. An approver approves it from the job page or under **Operate → Environments → v3-prod**. To roll back, run the previous tag's `publish-to-v3-prod` job again.
 
 ## Reference
 

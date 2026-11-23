@@ -1,0 +1,20 @@
+# DRAFT: not yet run on GitLab.
+# Publishes robot folders to Sema4.ai v3 task packages on every push to the default branch.
+# Getting started: include from .gitlab-ci.yml and see publish-from-git/README.md in
+# https://github.com/sema4ai-external/robocorp-to-v3.
+
+publish-to-v3:
+  stage: deploy
+  image: python:3.12                    # includes git, which the script uses
+  resource_group: publish-to-v3         # one publish at a time, so versions land in order
+  variables:
+    GIT_DEPTH: 0                        # the script compares with the previous push
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
+      variables:
+        SYNC_ARGS: --base $CI_COMMIT_BEFORE_SHA
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "web"
+      variables:
+        SYNC_ARGS: --all                # "Run pipeline" publishes every mapped folder
+  script:
+    - python3 v3-publish/taskpackage_sync.py $SYNC_ARGS
