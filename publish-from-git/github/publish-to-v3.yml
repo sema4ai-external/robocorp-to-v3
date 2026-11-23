@@ -1,5 +1,5 @@
 # Publishes robot folders to Sema4.ai v3 task packages on every push to main.
-# Getting started: copy to .github/workflows/ and see publish-from-git/README.md in
+# Quick start: copy to .github/workflows/ and see publish-from-git/README.md in
 # https://github.com/sema4ai-external/robocorp-to-v3.
 name: Publish to v3
 
