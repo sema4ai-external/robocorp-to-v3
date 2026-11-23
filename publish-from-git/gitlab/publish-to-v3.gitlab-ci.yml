@@ -1,6 +1,6 @@
 # DRAFT: not yet run on GitLab.
 # Publishes robot folders to Sema4.ai v3 task packages on every push to the default branch.
-# Getting started: include from .gitlab-ci.yml and see publish-from-git/README.md in
+# Getting started: include from .gitlab-ci.yml and see publish-from-git/gitlab.md in
 # https://github.com/sema4ai-external/robocorp-to-v3.
 
 publish-to-v3:
